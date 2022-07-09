@@ -30,7 +30,6 @@ let model = {
     fire(guess) {
         for (let i = 0; i < this.numShips; i++){
             let ship = this.ships[i];
-            let index = ship.locations.indexOf(guess);
             if (index >= 0) { // A hit!
                 ship.hits[index] = 'hit';
                 view.displayHit(guess);
@@ -42,7 +41,7 @@ let model = {
                 return true;
             }
         }
-        view.displayHit(guess);
+        view.displayMiss (guess);
         view.displayMessage('You missed.');
         return false;
     },
@@ -76,7 +75,25 @@ let controller = {
     },
 };
 
-// Get and process players guess
+// Get players guess
+function handleFireButton() {
+    let guessInput = document.getElementById('guessInput'); 
+    let guess = guessInput.value;
+    controller.processGuess(guess);
+    guessInput.value = ''; // reset guess on screen
+}
+
+function handleKeyPress(e) {
+    console.log(e); 
+    let fireButton = document.getElementById('fireButton');
+    if (e.key === 'Enter') {
+        fireButton.click();
+        return false;
+   }
+
+}
+
+// Process players guess
 function parseGuess(guess) {
     let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     if (guess === null || guess.length !== 2) {
@@ -96,3 +113,15 @@ function parseGuess(guess) {
     }
     return null;
 }
+
+function init() {
+    let fireButton = document.getElementById('fireButton');
+    fireButton.onclick = handleFireButton;
+   // alt method: fireButton.addEventListener('click', handleFireButton);
+    let guessInput = document.getElementById('guessInput');
+    guessInput.onkeydown = handleKeyPress;
+}
+
+window.onload = init;
+
+model.fire('53');
