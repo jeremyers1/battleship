@@ -1,2 +1,3 @@
 # battleship
-Battleship Game
+
+Battleship Game created with Head First JavaScript
