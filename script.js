@@ -1,17 +1,17 @@
 // View: Update the User's View
 let view = {
-    displayMessage(msg) {
+    displayMessage(message) {
         let messageArea = document.getElementById('messageArea');
-        messageArea.textContent = msg;
+        messageArea.textContent = message;
     },
 
-    displayHit(loc) {
-        let cell = document.getElementById(loc);
+    displayHit(location) {
+        let cell = document.getElementById(location);
         cell.setAttribute('class', 'hit');
     },
 
-    displayMiss(loc) {
-        let cell = document.getElementById(loc);
+    displayMiss(location) {
+        let cell = document.getElementById(location);
         cell.setAttribute('class', 'miss');
     }
 }
@@ -58,3 +58,41 @@ let model = {
 };
 
 // Controller: Control player input and game logic
+let controller = {
+    guesses: 0,
+    processGuess(guess) {
+        if (model.shipsSunk < model.numShips){
+            let location = parseGuess(guess);
+            if (location) {
+                this.guesses++;
+                let hit = model.fire(location);
+                if (hit && model.shipsSunk === model.numShips) {
+                    view.displayMessage(`You sank all my battleships in ${this.guesses} guesses.`)
+                }
+            }
+        } else {
+            view.displayMessage('You already sank all my battleships. Refresh the page to play again.');
+        }
+    },
+};
+
+// Get and process players guess
+function parseGuess(guess) {
+    let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    if (guess === null || guess.length !== 2) {
+        alert('Oops! Please enter a letter and a number from the board.');
+    } else {
+        let firstChar = guess.charAt(0).toUpperCase();
+        let row = alphabet.indexOf(firstChar);
+        let column = guess.charAt(1);
+
+        if (isNaN(row) || isNaN(column)) {
+            alert('Oops! That is not on the board.');
+        } else if (row < 0 || row >= model.boardsize || column < 0 || column >= model.boardsize) { 
+            alert('Oops! That is not on the board.');
+        } else {
+            return row + column;
+        }
+    }
+    return null;
+}
