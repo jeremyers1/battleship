@@ -23,13 +23,66 @@ let model = {
     shipLength: 3,
     shipsSunk: 0,
 
-    ships: [{ locations: ['06', '16', '26'], hits: ['', '', ''] },
-        { locations: ['24', '34', '44'], hits: ['', '', ''] },
-        { locations: ['10', '11', '12'], hits: ['', '', ''] }],
+/* TODO: 
+* 1. don't allow an entered box to be entered again? (but in real battleship, you can) ... 
+* 2. enable ships array to grow with numShips variable above
+* 3. make table td clickable with mouse
+*/
+
+ // let's create locations with code now
+      ships: [{ locations: ['0', '0', '0'], hits: ['', '', ''] },
+        { locations: ['0', '0', '0'], hits: ['', '', ''] },
+        { locations: ['0', '0', '0'], hits: ['', '', ''] }], 
     
+    generateShipLocations() {
+        let locations;
+        for (let i = 0; i < this.numShips; i++){
+            do { //do-while keeps trying until a ship is made without a collision
+                locations = this.generateShip();
+            } while (this.collision(locations));
+            this.ships[i].locations = locations;
+        }
+    },
+
+    generateShip() {
+        let direction = Math.floor(Math.random() * 2);
+        let row;
+        let col;
+        if (direction === 1) { //starting block and width for horizontal ship 
+            row = Math.floor(Math.random() * this.boardsize);
+            col = Math.floor(Math.random() * (this.boardsize - (this.shipLength + 1)));
+        } else { // starting block and height for vertical ship
+            row = Math.floor(Math.random() * (this.boardsize - (this.shipLength + 1)));
+            col = Math.floor(Math.random() * this.boardsize);     
+        }
+
+        let newShipLocations = [];
+        for (let i = 0; i < this.shipLength; i++){
+            if (direction === 1) {
+                newShipLocations.push(row + '' + (col + i));
+            } else {
+                newShipLocations.push((row + i) + '' + col);
+            }
+        }
+        return newShipLocations;
+    },
+
+    collision(locations) {
+        for (let i = 0; i < this.numShips; i++){
+            let ship = this.ships[i];
+            for (let j = 0; j < locations.length; j++){
+                if (ship.locations.indexOf(locations[j]) >= 0) {
+                    return true;
+                }
+            }
+        }
+        return false; // no collision, so good location
+    },
+       
     fire(guess) {
         for (let i = 0; i < this.numShips; i++){
             let ship = this.ships[i];
+            let index = ship.locations.indexOf(guess);
             if (index >= 0) { // A hit!
                 ship.hits[index] = 'hit';
                 view.displayHit(guess);
@@ -120,8 +173,7 @@ function init() {
    // alt method: fireButton.addEventListener('click', handleFireButton);
     let guessInput = document.getElementById('guessInput');
     guessInput.onkeydown = handleKeyPress;
+    model.generateShipLocations();
 }
 
 window.onload = init;
-
-model.fire('53');
