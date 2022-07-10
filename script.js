@@ -1,3 +1,11 @@
+/* TODO: 
+* 1. DONE: don't allow an entered box to be entered again? (but in real battleship, you can) ... 
+* 2. enable ships array to grow with numShips variable above
+* 3. make table td clickable with mouse
+* 4. add sounds
+*/
+
+
 // View: Update the User's View
 let view = {
     displayMessage(message) {
@@ -20,28 +28,21 @@ let view = {
 let model = {
     boardsize: 7,
     numShips: 3,
-    shipLength: 3,
+    shipLength: 4,
     shipsSunk: 0,
 
-/* TODO: 
-* 1. don't allow an entered box to be entered again? (but in real battleship, you can) ... 
-* 2. enable ships array to grow with numShips variable above
-* 3. make table td clickable with mouse
-*/
-
  // let's create locations with code now
-      ships: [{ locations: ['0', '0', '0'], hits: ['', '', ''] },
-        { locations: ['0', '0', '0'], hits: ['', '', ''] },
-        { locations: ['0', '0', '0'], hits: ['', '', ''] }], 
+    ships : [{ locations: ['0'], hits: [''] },{ locations: ['0'], hits: [''] },{ locations: ['0'], hits: [''] }],
     
-    generateShipLocations() {
+    generateShipLocations() {      
         let locations;
         for (let i = 0; i < this.numShips; i++){
             do { //do-while keeps trying until a ship is made without a collision
                 locations = this.generateShip();
             } while (this.collision(locations));
             this.ships[i].locations = locations;
-        }
+        } 
+        console.log(this.ships);
     },
 
     generateShip() {
@@ -83,7 +84,10 @@ let model = {
         for (let i = 0; i < this.numShips; i++){
             let ship = this.ships[i];
             let index = ship.locations.indexOf(guess);
-            if (index >= 0) { // A hit!
+            if (ship.hits[index] === "hit") {
+                view.displayMessage("Oops, you already hit that location!");
+                return true;
+            } else if (index >= 0) { // A hit!
                 ship.hits[index] = 'hit';
                 view.displayHit(guess);
                 view.displayMessage('HIT!');
