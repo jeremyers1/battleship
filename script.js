@@ -27,13 +27,26 @@ let view = {
 // Model: Keep Track of ship location and status
 let model = {
     boardsize: 7,
-    numShips: 3,
+    numShips: 3, /* learning note: as written, if you update numShips, 
+    you also have to manually add a ship object to the ships array below...
+    and you cannot use a for loop to populate the ships array with ship objects
+    because objects are passed by reference and all ships end up as exact copies 
+    So, use a factory function to create the number of ships needed */
     shipLength: 4,
     shipsSunk: 0,
 
  // let's create locations with code now
-    ships : [{ locations: ['0'], hits: [''] },{ locations: ['0'], hits: [''] },{ locations: ['0'], hits: [''] }],
+    ships : [],
     
+    buildShip() {
+        let ship = { locations: ['0'], hits: [''] };
+        return ship;
+    },
+
+    generateShipArray() {
+        this.ships = Array(this.numShips).fill(0).map(e => this.buildShip());
+    },
+
     generateShipLocations() {      
         let locations;
         for (let i = 0; i < this.numShips; i++){
@@ -42,7 +55,6 @@ let model = {
             } while (this.collision(locations));
             this.ships[i].locations = locations;
         } 
-        console.log(this.ships);
     },
 
     generateShip() {
@@ -141,7 +153,6 @@ function handleFireButton() {
 }
 
 function handleKeyPress(e) {
-    console.log(e); 
     let fireButton = document.getElementById('fireButton');
     if (e.key === 'Enter') {
         fireButton.click();
@@ -177,6 +188,7 @@ function init() {
    // alt method: fireButton.addEventListener('click', handleFireButton);
     let guessInput = document.getElementById('guessInput');
     guessInput.onkeydown = handleKeyPress;
+    model.generateShipArray();
     model.generateShipLocations();
 }
 
