@@ -1,7 +1,7 @@
 /* TODO: 
 * 1. DONE: don't allow an entered box to be entered again? (but in real battleship, you can) ... 
-* 2. enable ships array to grow with numShips variable above
-* 3. make table td clickable with mouse
+* 2. DONE: enable ships array to grow with numShips variable above
+* 3. DONE: make table td clickable with mouse
 * 4. add sounds
 */
 
@@ -129,7 +129,7 @@ let model = {
 let controller = {
     guesses: 0,
     processGuess(guess) {
-        if (model.shipsSunk < model.numShips){
+        if (model.shipsSunk < model.numShips) {
             let location = parseGuess(guess);
             if (location) {
                 this.guesses++;
@@ -161,12 +161,20 @@ function handleKeyPress(e) {
 
 }
 
+// Get player guess via mouseclick
+function handleMouseClick(e) {
+    let box = e.target.closest('td');
+    if (!box) { return; } // Quit, not clicked on a box
+    let guess = box.id;
+    controller.processGuess(guess);
+}
+
 // Process players guess
 function parseGuess(guess) {
     let alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     if (guess === null || guess.length !== 2) {
         alert('Oops! Please enter a letter and a number from the board.');
-    } else {
+    } else if (alphabet.indexOf(guess.charAt(0)) > -1) { // convert keyboard to proper td id
         let firstChar = guess.charAt(0).toUpperCase();
         let row = alphabet.indexOf(firstChar);
         let column = guess.charAt(1);
@@ -178,6 +186,8 @@ function parseGuess(guess) {
         } else {
             return row + column;
         }
+    } else { // mouse click already uses proper td id
+        return guess;
     }
     return null;
 }
@@ -188,6 +198,8 @@ function init() {
    // alt method: fireButton.addEventListener('click', handleFireButton);
     let guessInput = document.getElementById('guessInput');
     guessInput.onkeydown = handleKeyPress;
+    let guessInputMouse = document.getElementById('board');
+    guessInputMouse.onclick = handleMouseClick;
     model.generateShipArray();
     model.generateShipLocations();
 }
